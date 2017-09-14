@@ -1,0 +1,28 @@
+using Seagull.BarTender.Print; //这是一个天大的坑
+
+//打印标签Demo
+public bool PrintLable(PrintLableDTO dto)
+{
+    Seagull.BarTender.Print.Engine engine = new Seagull.BarTender.Print.Engine(true);
+    LabelFormatDocument btFormat = engine.Documents.Open("D:\\PrintDemo.btw");
+    btFormat.PrintSetup.PrinterName = "10.62.0.17(信息部)";
+    btFormat.PrintSetup.IdenticalCopiesOfLabel = 1; //打印份数
+    btFormat.SubStrings["Code"].Value = dto.Code;//为Bartender里的数据源（文本框、条码等等）传值
+    btFormat.SubStrings["QRcode"].Value = dto.Qrcode;
+    btFormat.SubStrings["Name"].Value = dto.Name;
+    btFormat.SubStrings["Memo"].Value = dto.Memo;
+    //Messages messages;
+    int waitout = 10000; // 10秒 超时
+    Result nResult = btFormat.Print("标签打印软件", waitout/*, out messages*/);
+    btFormat.PrintSetup.Cache.FlushInterval = CacheFlushInterval.PerSession;
+    btFormat.Close(SaveOptions.DoNotSaveChanges);//不保存对打开模板的修改
+    engine.Stop();
+    if(nResult == Result.Success)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
